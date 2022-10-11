@@ -25,6 +25,7 @@ client.DisTube = new DisTube(client, {
     emitAddSongWhenCreatingQueue: false,
     emitAddListWhenCreatingQueue: false
 });
+const distubeC = client.DisTube;
 
 const rest = new REST({ version: '10' }).setToken(BOT_TOKEN);
 
@@ -42,25 +43,37 @@ client.on("messageCreate", (message) => {
 
 client.on("interactionCreate", (interaction) => {
     if (interaction.isChatInputCommand()) {
+        const interGuild = interaction.guild;
         if (interaction.commandName === playCommand.name) {
             const song = interaction.options.get("song").value;
             console.log(`Added ${song} to queue`);
-            client.DisTube.play(interaction.member.voice.channel, song, {
+            distubeC.play(interaction.member.voice.channel, song, {
                 textChannel: interaction.channel,
                 member: interaction.member,
             });
             interaction.reply({ content: `Added \`${song}\` to queue - (**${interaction.member.displayName}**)` });
         } else if (interaction.commandName === disconnectCommand.name) {
-            client.DisTube.voices.leave(interaction.guild);
+            distubeC.voices.leave(interGuild);
             interaction.reply({ content: `Leaving voice channel - (**${interaction.member.displayName}**)` });
         } else if (interaction.commandName === skipCommand.name) {
-            client.DisTube.skip(interaction.guild);
-            interaction.reply({ content: `Skipping current song - (**${interaction.member.displayName}**)` });
+            let currentQueue = distubeC.getQueue(interGuild);
+            if (currentQueue !== undefined &&
+                (distubeC.getQueue(interGuild).songs.length > 0 || 
+                distubeC.getQueue(interGuild).playing)) {
+                if (distubeC.getQueue(interGuild).songs.length == 1 && !distubeC.getQueue(interGuild).autoplay) {
+                    distubeC.stop(interGuild);
+                } else {
+                    distubeC.skip(interGuild);
+                }
+                interaction.reply({ content: `Skipping current song - (**${interaction.member.displayName}**)` });
+            } else {
+                interaction.reply({ content: `The queue is empty` });
+            }
         }
     }
 });
 
-client.DisTube.on("playSong", (queue, song) => {
+distubeC.on("playSong", (queue, song) => {
     queue.textChannel.send(
         `>>> **Playing**: ${song.name}\n` +
         `**Duration**: ${song.formattedDuration}\n` +
