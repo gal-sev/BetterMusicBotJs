@@ -2,7 +2,7 @@ import { config } from "dotenv";
 import { Client, GatewayIntentBits, Routes } from "discord.js";
 import { REST } from "@discordjs/rest";
 import { DisTube } from "distube";
-import { commands, playCommand, disconnectCommand } from "./commands.js";
+import { commands, playCommand, disconnectCommand, skipCommand } from "./commands.js";
 
 config(); // Load .env
 
@@ -33,7 +33,7 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", (message) => {
-    if (message.author.tag != client.user.tag) {
+    if (message.author.tag !== client.user.tag) {
         if (message.content.toLowerCase() === "hello there") {
             message.channel.send("General Kenobi");
         }
@@ -42,17 +42,20 @@ client.on("messageCreate", (message) => {
 
 client.on("interactionCreate", (interaction) => {
     if (interaction.isChatInputCommand()) {
-        if (interaction.commandName == playCommand.name) {
+        if (interaction.commandName === playCommand.name) {
             const song = interaction.options.get("song").value;
             console.log(`Added ${song} to queue`);
             client.DisTube.play(interaction.member.voice.channel, song, {
                 textChannel: interaction.channel,
                 member: interaction.member,
             });
-            interaction.reply({ content: `Added ${song} to queue` });
-        }
-        if (interaction.commandName == disconnectCommand.name) {
+            interaction.reply({ content: `Added \`${song}\` to queue - (**${interaction.member.displayName}**)` });
+        } else if (interaction.commandName === disconnectCommand.name) {
             client.DisTube.voices.leave(interaction.guild);
+            interaction.reply({ content: `Leaving voice channel - (**${interaction.member.displayName}**)` });
+        } else if (interaction.commandName === skipCommand.name) {
+            client.DisTube.skip(interaction.guild);
+            interaction.reply({ content: `Skipping current song - (**${interaction.member.displayName}**)` });
         }
     }
 });
