@@ -1,0 +1,2 @@
+# BetterMusicBotJs
+Discord music bot
