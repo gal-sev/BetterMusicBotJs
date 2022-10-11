@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import { Client, GatewayIntentBits, Routes } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
 
 config(); // Load .env
@@ -39,20 +40,16 @@ client.on("interactionCreate", (interaction) => {
 });
 
 async function main() {
-    const commands = [
-        {
-            name: "play",
-            description: "Play music command",
-            options: [
-                {
-                    name: "song",
-                    description: "Song to play",
-                    type: 3,
-                    required: true
-                },
-            ]
-        }
-    ];
+
+    const playCommand = new SlashCommandBuilder().setName("play")
+        .setDescription("Play music command")
+        .addStringOption((option) => 
+            option.setName("song")
+                .setDescription("Song to play")
+                .setRequired(true)
+        );
+
+    const commands = [playCommand.toJSON()];
     try {
         console.log("Started refreshing application (/) commands.");
         await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
