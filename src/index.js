@@ -2,7 +2,7 @@ import { config } from "dotenv";
 import { Client, GatewayIntentBits, Routes } from "discord.js";
 import { REST } from "@discordjs/rest";
 import { DisTube } from "distube";
-import { commands, playCommand, disconnectCommand, skipCommand } from "./commands.js";
+import { commands, playCommand, disconnectCommand, skipCommand, queueCommand } from "./commands.js";
 
 config(); // Load .env
 
@@ -13,8 +13,6 @@ const GUILD_ID = process.env.GUILD_ID;
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildIntegrations,
         GatewayIntentBits.GuildVoiceStates
     ]
@@ -33,14 +31,6 @@ client.on("ready", () => {
     console.log(`${client.user.tag} is running`);
 });
 
-client.on("messageCreate", (message) => {
-    if (message.author.tag !== client.user.tag) {
-        if (message.content.toLowerCase() === "hello there") {
-            message.channel.send("General Kenobi");
-        }
-    }
-});
-
 client.on("interactionCreate", (interaction) => {
     if (interaction.isChatInputCommand()) {
         const interGuild = interaction.guild;
@@ -56,16 +46,29 @@ client.on("interactionCreate", (interaction) => {
             distubeC.voices.leave(interGuild);
             interaction.reply({ content: `Leaving voice channel - (**${interaction.member.displayName}**)` });
         } else if (interaction.commandName === skipCommand.name) {
-            let currentQueue = distubeC.getQueue(interGuild);
+            const currentQueue = distubeC.getQueue(interGuild);
             if (currentQueue !== undefined &&
-                (distubeC.getQueue(interGuild).songs.length > 0 || 
-                distubeC.getQueue(interGuild).playing)) {
-                if (distubeC.getQueue(interGuild).songs.length == 1 && !distubeC.getQueue(interGuild).autoplay) {
+                (currentQueue.songs.length > 0 || 
+                    currentQueue.playing)) {
+                if (currentQueue.songs.length == 1 && !currentQueue.autoplay) {
                     distubeC.stop(interGuild);
                 } else {
                     distubeC.skip(interGuild);
                 }
                 interaction.reply({ content: `Skipping current song - (**${interaction.member.displayName}**)` });
+            } else {
+                interaction.reply({ content: `The queue is empty` });
+            }
+        } else if (interaction.commandName === queueCommand.name) {
+            const currentQueue = distubeC.getQueue(interGuild);
+            if (currentQueue !== undefined) {
+                interaction.reply({ content: 
+                    `>>> **Songs in queue**: ${currentQueue.songs.length}\n` +
+                    `**Queue Duration**: ${currentQueue.formattedDuration}\n` +
+                    `**Current Song**: ${currentQueue.songs[0].name} - (${currentQueue.songs[0].formattedDuration})\n` +
+                    `**Queue:**\n` + "```" +
+                    currentQueue.songs.map((song, index) => `${index}. ${song.name}\n`).toString().replaceAll(",", "") +
+                    "```"});
             } else {
                 interaction.reply({ content: `The queue is empty` });
             }

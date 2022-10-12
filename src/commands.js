@@ -13,5 +13,8 @@ export const disconnectCommand = new SlashCommandBuilder().setName("disconnect")
 
 export const skipCommand = new SlashCommandBuilder().setName("skip")
     .setDescription("Skip the current song");
+
+export const queueCommand = new SlashCommandBuilder().setName("queue")
+    .setDescription("Print the songs queue");
     
-export const commands = [playCommand.toJSON(), disconnectCommand.toJSON(), skipCommand.toJSON()];
+export const commands = [playCommand.toJSON(), disconnectCommand.toJSON(), skipCommand.toJSON(), queueCommand.toJSON()];
