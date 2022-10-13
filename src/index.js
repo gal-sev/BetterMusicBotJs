@@ -1,6 +1,6 @@
 import express from 'express';
 import { config } from "dotenv";
-import { runBot } from "./bot.js";
+import { runBot, executeWebPlayCommand } from "./bot.js";
 
 const app = express();
 
@@ -11,6 +11,15 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const GUILD_ID = process.env.GUILD_ID;
 
 runBot(BOT_TOKEN, CLIENT_ID, GUILD_ID);
+
+app.get(`/play/:songName`, (req, res) => {
+    if (executeWebPlayCommand(req.params.songName)) {
+        res.send(`Playing ${req.params.songName}`);
+    } else {
+        res.send(`Error: No discord user interaction avaliable.`);
+    }
+    
+});
 
 app.get(`*`, (req, res) => {
     res.send(`Result: Working`);

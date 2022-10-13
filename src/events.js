@@ -1,4 +1,4 @@
-import { playCommand, disconnectCommand, skipCommand, queueCommand } from "./commands.js";
+import { playCommand, disconnectCommand, skipCommand, queueCommand, setLastUserInteraction, executePlayCommand } from "./commands.js";
 
 export function onReadyEvent(client) {
     client.on("ready", () => {
@@ -10,20 +10,16 @@ export function onReadyEvent(client) {
 export function onInteractionCreateEvent(client, distubeC) {
     client.on("interactionCreate", (interaction) => {
         if (interaction.isChatInputCommand()) {
+            // set the last user interaction to current one
+            setLastUserInteraction(interaction);
             const interGuild = interaction.guild;
             if (interaction.commandName === playCommand.name) {
                 const song = interaction.options.get("song").value;
-                console.log(`Added ${song} to queue`);
-                distubeC.play(interaction.member.voice.channel, song, {
-                    textChannel: interaction.channel,
-                    member: interaction.member,
-                });
-                interaction.reply({ content: `Added \`${song}\` to queue - (**${interaction.member.displayName}**)` });
+                executePlayCommand(distubeC, interaction, song);
             } else if (interaction.commandName === disconnectCommand.name) {
                 distubeC.voices.leave(interGuild);
                 interaction.reply({ content: `Leaving voice channel - (**${interaction.member.displayName}**)` });
             } else if (interaction.commandName === skipCommand.name) {
-                //TODO: Change to embed later? - https://discordjs.guide/popular-topics/embeds.html#using-the-embed-constructor
                 const currentQueue = distubeC.getQueue(interGuild);
                 if (currentQueue !== undefined &&
                     (currentQueue.songs.length > 0 || 
@@ -60,7 +56,8 @@ export function onDisPlaySongEvent(distubeC) {
         queue.textChannel.send(
             `>>> **Playing**: ${song.name}\n` +
             `**Duration**: ${song.formattedDuration}\n` +
-            `**Requested By**: ${song.member.displayName}\n` +
+            //Using username instead of displayName so it will display "web interface" when needed
+            `**Requested By**: ${song.member.username}\n` +
             `**URL:** ${song.url}`);
     })
 }

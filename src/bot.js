@@ -1,25 +1,31 @@
 import { Client, GatewayIntentBits, Routes } from "discord.js";
 import { REST } from "@discordjs/rest";
 import { DisTube } from "distube";
-import { commands } from "./commands.js";
+import { commands, executePlayCommand } from "./commands.js";
 import { onDisPlaySongEvent, onInteractionCreateEvent, onReadyEvent } from "./events.js";
 
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildIntegrations,
+        GatewayIntentBits.GuildVoiceStates
+    ]
+});
+
+client.DisTube = new DisTube(client, {
+    leaveOnStop: false,
+    emitAddSongWhenCreatingQueue: false,
+    emitAddListWhenCreatingQueue: false
+});
+
+export const distubeC = client.DisTube;
+
+export function executeWebPlayCommand(song) {
+    return executePlayCommand(distubeC, undefined, song);
+}
+
 export async function runBot(BOT_TOKEN, CLIENT_ID, GUILD_ID) {
-    const client = new Client({
-        intents: [
-            GatewayIntentBits.Guilds,
-            GatewayIntentBits.GuildIntegrations,
-            GatewayIntentBits.GuildVoiceStates
-        ]
-    });
-    
     const rest = new REST({ version: '10' }).setToken(BOT_TOKEN);
-    client.DisTube = new DisTube(client, {
-        leaveOnStop: false,
-        emitAddSongWhenCreatingQueue: false,
-        emitAddListWhenCreatingQueue: false
-    });
-    const distubeC = client.DisTube;
 
     try {
         //Update the slash commands
