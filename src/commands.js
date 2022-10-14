@@ -44,6 +44,25 @@ export function executePlayCommand(distubeC, interaction, song) {
 export const disconnectCommand = new SlashCommandBuilder().setName("disconnect")
     .setDescription("Disconnect bot from voice channel");
 
+export function executeDisconnectCommand(distubeC, interaction) {
+    if (interaction === undefined) {
+        if (lastUserInteraction === undefined) {
+            // *Interaction from website without any prior discord interactions*
+            console.log("No discord user interaction avaliable.");
+            // Break out of the function
+            return false;
+        } else {
+            // *Interaction from website with a prior discord interaction*
+            interaction = lastUserInteraction;
+        }
+    } else {
+        // *Interaction from discord*
+        interaction.reply({ content: `Leaving voice channel - (**${interaction.member.displayName}**)` });
+    }
+    distubeC.voices.leave(interaction.guild);
+    return true;
+}
+
 export const skipCommand = new SlashCommandBuilder().setName("skip")
     .setDescription("Skip the current song");
 

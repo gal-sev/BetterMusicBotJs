@@ -1,4 +1,4 @@
-import { playCommand, disconnectCommand, skipCommand, queueCommand, setLastUserInteraction, executePlayCommand } from "./commands.js";
+import { playCommand, disconnectCommand, skipCommand, queueCommand, setLastUserInteraction, executePlayCommand, executeDisconnectCommand } from "./commands.js";
 
 export function onReadyEvent(client) {
     client.on("ready", () => {
@@ -17,8 +17,7 @@ export function onInteractionCreateEvent(client, distubeC) {
                 const song = interaction.options.get("song").value;
                 executePlayCommand(distubeC, interaction, song);
             } else if (interaction.commandName === disconnectCommand.name) {
-                distubeC.voices.leave(interGuild);
-                interaction.reply({ content: `Leaving voice channel - (**${interaction.member.displayName}**)` });
+                executeDisconnectCommand(distubeC, interaction);
             } else if (interaction.commandName === skipCommand.name) {
                 const currentQueue = distubeC.getQueue(interGuild);
                 if (currentQueue !== undefined &&
