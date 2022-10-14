@@ -102,4 +102,20 @@ export function executeSkipCommand(distubeC, interaction) {
 export const queueCommand = new SlashCommandBuilder().setName("queue")
     .setDescription("Print the songs queue");
 
+// Discord only command, because its not necessary  on web
+export function executeQueueCommand(distubeC, interaction) {
+    const currentQueue = distubeC.getQueue(interaction.guild);
+    if (currentQueue !== undefined) {
+        interaction.reply({ content: 
+            `>>> **Songs in queue**: ${currentQueue.songs.length}\n` +
+            `**Queue Duration**: ${currentQueue.formattedDuration}\n` +
+            `**Current Song**: ${currentQueue.songs[0].name} - (${currentQueue.songs[0].formattedDuration})\n` +
+            `**Queue:**\n` + "```" +
+            currentQueue.songs.map((song, index) => `${index}. ${song.name}\n`).toString().replaceAll(",", "") +
+            "```"});
+    } else {
+        interaction.reply({ content: `The queue is empty` });
+    }
+}
+
 export const commands = [playCommand.toJSON(), disconnectCommand.toJSON(), skipCommand.toJSON(), queueCommand.toJSON()];
