@@ -1,6 +1,6 @@
 import express from 'express';
 import { config } from "dotenv";
-import { runBot, runWebDisconnectCommand, runWebPlayCommand } from "./bot.js";
+import { runBot, runWebDisconnectCommand, runWebPlayCommand, runWebSkipCommand } from "./bot.js";
 
 const app = express();
 
@@ -23,6 +23,14 @@ app.get(`/play/:songName`, (req, res) => {
 app.get(`/disconnect`, (req, res) => {
     if (runWebDisconnectCommand()) {
         res.send(`Bot disconnected from voice channel`);
+    } else {
+        res.send(`Error: No discord user interaction avaliable.`);
+    } 
+});
+
+app.get(`/skip`, (req, res) => {
+    if (runWebSkipCommand()) {
+        res.send(`Bot Skipped song`);
     } else {
         res.send(`Error: No discord user interaction avaliable.`);
     } 

@@ -40,7 +40,7 @@ export function executePlayCommand(distubeC, interaction, song) {
     console.log(`Added ${song} to queue - ${interaction.member.username}`);
     return true;
 }
-    
+
 export const disconnectCommand = new SlashCommandBuilder().setName("disconnect")
     .setDescription("Disconnect bot from voice channel");
 
@@ -66,7 +66,40 @@ export function executeDisconnectCommand(distubeC, interaction) {
 export const skipCommand = new SlashCommandBuilder().setName("skip")
     .setDescription("Skip the current song");
 
+export function executeSkipCommand(distubeC, interaction) {
+    if (interaction === undefined) {
+        if (lastUserInteraction === undefined) {
+            // *Interaction from website without any prior discord interactions*
+            console.log("No discord user interaction avaliable.");
+            // Break out of the function
+            return false;
+        } else {
+            // *Interaction from website with a prior discord interaction*
+            interaction = lastUserInteraction;
+        }
+    } else {
+        // *Interaction from discord*
+        const currentQueue = distubeC.getQueue(interaction.guild);
+        if (currentQueue !== undefined &&
+            (currentQueue.songs.length > 0 || currentQueue.playing)) {
+            interaction.reply({ content: `Skipping current song - (**${interaction.member.displayName}**)` });
+        } else {
+            interaction.reply({ content: `The queue is empty` });
+        }
+    }
+    const currentQueue = distubeC.getQueue(interaction.guild);
+    if (currentQueue !== undefined &&
+        (currentQueue.songs.length > 0 || currentQueue.playing)) {
+        if (currentQueue.songs.length == 1 && !currentQueue.autoplay) {
+            distubeC.stop(interaction.guild);
+        } else {
+            distubeC.skip(interaction.guild);
+        }
+    }
+    return true;
+}
+
 export const queueCommand = new SlashCommandBuilder().setName("queue")
     .setDescription("Print the songs queue");
-    
+
 export const commands = [playCommand.toJSON(), disconnectCommand.toJSON(), skipCommand.toJSON(), queueCommand.toJSON()];
