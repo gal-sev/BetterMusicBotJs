@@ -1,0 +1,37 @@
+@use "../shared/variables";
+
+.BottomController {
+  background-image: linear-gradient(to top, variables.$back-color , #3b435267);
+  border-radius: 5px;
+  padding: 8px 0px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  font-size: calc(10px + 2vmin);
+  color: variables.$text-color;
+  .SongName {
+    font-size: calc(10px + 2vmin);
+    color: variables.$text-color;
+  }
+  .SongControls {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 4;
+    max-width: 300px;
+    justify-content: space-evenly;
+    padding: 3px;
+    border: rgba(255, 255, 255, 0.292) solid 3px;
+    border-radius: 8px;
+    button {
+      background-color: #282c3400;
+      border: 0px;
+      font-size: calc(10px + 2vmin);
+      color: variables.$text-color;
+    }
+    #ShuffleButton {
+      border-left: rgba(255, 255, 255, 0.241) solid 3px;
+      padding-left: 20px;
+    }
+  }
+}
