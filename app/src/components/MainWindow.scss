@@ -1,0 +1,27 @@
+@use "../shared/variables";
+
+.MainWindow {
+  display: flex;
+  flex-direction: column;
+  color: variables.$text-color;
+  align-content: center;
+  justify-content: center;
+  height: 87vh;
+  background-color: variables.$content-backround-color;
+  h1 {
+    text-align: center;
+  }
+  .ContentHolder {
+    display: flex;
+    flex-direction: row;
+    height: 80%;
+    justify-content: space-evenly;
+    align-items: center;
+    .Content {
+      background-image: linear-gradient(to top, variables.$back-color , #35404cf3);
+      height: 95%;
+      width: 40%;
+      border-radius: 20px;
+    }
+  }
+}

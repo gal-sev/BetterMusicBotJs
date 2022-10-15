@@ -1,0 +1,47 @@
+@use "../shared/variables";
+
+.Search {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .SearchTop {
+    display: flex;
+    flex-direction: row;
+    width: 95%;
+    justify-content: space-between;
+    padding: 10px;
+    #SearchInput {
+      align-self: flex-start;
+      width: 85%;
+      background-color: #65656557;
+      border: rgba(255, 255, 255, 0.292) solid 3px;
+      border-radius: 7px;
+      margin: 4px;
+      padding: 4px;
+      font-size: calc(10px + 1vmin);
+      color: variables.$text-color;
+      transition: 0.5s;
+      &:focus{
+        background-color: lighten($color: #65656557, $amount: 10);
+        border: lighten($color: #ffffff4a, $amount: 20) solid 3px;
+        border-radius: 7px;
+        outline: none;
+      }
+    }
+    button {
+      margin-left: 10px;
+      background-color: rgba(0, 0, 0, 0);
+      border: none;
+      font-size: calc(10px + 1.5vmin);
+      color: #ffffff6e;
+      transition: 0.3s;
+      &:hover {
+        transform: scale(1.15);
+      }
+      &:active {
+        color: darken($color: #ffffff6e, $amount: 20);
+        transform: scale(1.10) translate(1px,2px);
+      }
+    }
+  }
+}
