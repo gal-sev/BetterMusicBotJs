@@ -1,10 +1,15 @@
 import express from 'express';
 import { config } from "dotenv";
-import { runBot, runWebDisconnectCommand, runWebPlayCommand, runWebSkipCommand } from "./bot.js";
+import { runBot, runWebDisconnectCommand, runWebPlayCommand, runWebSkipCommand } from "./src/bot.js";
+import path from "path";
+import { fileURLToPath } from 'url';
 
 const app = express();
 
 config(); // Load .env
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -36,8 +41,10 @@ app.get(`/skip`, (req, res) => {
     } 
 });
 
+app.use(express.static(path.join(__dirname, "build")));
+
 app.get(`*`, (req, res) => {
-    res.send(`Result: Working`);
+    res.sendFile(path.join(__dirname, "build", "index.html"))
 });
 
 const port = process.env.PORT || 4000;
