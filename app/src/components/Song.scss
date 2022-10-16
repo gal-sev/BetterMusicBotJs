@@ -1,0 +1,42 @@
+@use "../shared/variables";
+
+.Song {
+  display: flex;
+  flex-direction: row;
+  // background-color: #4c5a67f3; //TODO: maybe change to this color later?
+  background-image: linear-gradient(to bottom, #4c5a67f3 , #3d4853f3);
+  border-radius: 5px;
+  width: 100%;
+  height: min-content;
+  align-items: center;
+  gap: 5px;
+  .Number {
+    font-size: calc(10px + 1vmin);
+    text-align: start;
+    padding-left: 5px;
+    color: variables.$text-color;
+  }
+  .Thumbnail {
+    margin: 2px;
+    width: 97px;
+    height: 73px;
+  }
+  .TextInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    .Title {
+      margin: 8px;
+      font-size: calc(10px + 0.5vmin);
+      text-align: center;
+      color: variables.$text-color;
+    }
+    .ExtraInfo {
+      display: flex;
+      font-size: calc(8px + 0.5vmin);
+      text-align: center;
+      color: darken($color: variables.$text-color, $amount: 30);
+      justify-content: space-evenly;
+    }
+  }
+}

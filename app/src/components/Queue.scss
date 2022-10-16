@@ -1,0 +1,19 @@
+@use "../shared/variables";
+
+.Queue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .QueueTop {
+    display: flex;
+    flex-direction: row;
+  }
+  .QueueHolder {
+    display: flex;
+    flex-direction: column;
+    width: 98%;
+    height: 80%;
+    gap: 8px;
+    overflow-y: auto;
+  }
+}

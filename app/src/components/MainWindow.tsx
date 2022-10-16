@@ -1,5 +1,6 @@
 import React from 'react';
 import './MainWindow.scss';
+import Queue from './Queue';
 import Search from './Search';
 
 function MainWindow() {
@@ -7,9 +8,7 @@ function MainWindow() {
     <div className="MainWindow">
       <h1 className='SongName' id='songName'>Music room</h1>
       <div className='ContentHolder'>
-        <div className='Content'>
-          <h2>Queue</h2>
-        </div>
+        <Queue />
         <Search />
       </div>
     </div>
