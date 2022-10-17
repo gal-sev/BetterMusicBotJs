@@ -1,6 +1,6 @@
 import './Song.scss';
 
-interface SongI {
+export interface SongI {
   number: number,
   youtubeId: string,
   name: string,

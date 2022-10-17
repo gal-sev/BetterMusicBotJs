@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits, Routes } from "discord.js";
 import { REST } from "@discordjs/rest";
 import { DisTube } from "distube";
-import { commands, executeDisconnectCommand, executePlayCommand, executeSkipCommand } from "./commands.js";
+import { commands, executeDisconnectCommand, executePlayCommand, executeQueueCommand, executeSkipCommand } from "./commands.js";
 import { onDisPlaySongEvent, onInteractionCreateEvent, onReadyEvent } from "./events.js";
 
 const client = new Client({
@@ -30,6 +30,10 @@ export function runWebDisconnectCommand() {
 
 export function runWebSkipCommand() {
     return executeSkipCommand(distubeC, undefined);
+}
+
+export function runWebQueueCommand() {
+    return executeQueueCommand(distubeC, undefined);
 }
 
 export async function runBot(BOT_TOKEN, CLIENT_ID, GUILD_ID) {

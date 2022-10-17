@@ -7,6 +7,29 @@
   .QueueTop {
     display: flex;
     flex-direction: row;
+    width: 95%;
+    justify-content: center;
+    h2 {
+      // margin left 6% is close to the button width, doing this to keep it center
+      margin-left: 6%;
+      width: 100%;
+      text-align: center;
+    }
+    button {
+      margin-left: 10px;
+      background-color: rgba(0, 0, 0, 0);
+      border: none;
+      font-size: calc(10px + 1.5vmin);
+      color: #ffffff6e;
+      transition: 0.3s;
+      &:hover {
+        transform: scale(1.15);
+      }
+      &:active {
+        color: darken($color: #ffffff6e, $amount: 20);
+        transform: scale(1.10) translate(1px,2px);
+      }
+    }
   }
   .QueueHolder {
     display: flex;
@@ -15,5 +38,8 @@
     height: 80%;
     gap: 8px;
     overflow-y: auto;
+    h3 {
+      text-align: center;
+    }
   }
 }

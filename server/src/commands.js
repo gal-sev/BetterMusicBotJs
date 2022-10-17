@@ -102,20 +102,52 @@ export function executeSkipCommand(distubeC, interaction) {
 export const queueCommand = new SlashCommandBuilder().setName("queue")
     .setDescription("Print the songs queue");
 
-// Discord only command, because its not necessary  on web
 export function executeQueueCommand(distubeC, interaction) {
-    const currentQueue = distubeC.getQueue(interaction.guild);
-    if (currentQueue !== undefined) {
-        interaction.reply({ content: 
-            `>>> **Songs in queue**: ${currentQueue.songs.length}\n` +
-            `**Queue Duration**: ${currentQueue.formattedDuration}\n` +
-            `**Current Song**: ${currentQueue.songs[0].name} - (${currentQueue.songs[0].formattedDuration})\n` +
-            `**Queue:**\n` + "```" +
-            currentQueue.songs.map((song, index) => `${index}. ${song.name}\n`).toString().replaceAll(",", "") +
-            "```"});
+    if (interaction === undefined) {
+        if (lastUserInteraction === undefined) {
+            // *Interaction from website without any prior discord interactions*
+            console.log("No discord user interaction avaliable.");
+            // Break out of the function
+            return "No discord user interaction avaliable";
+        } else {
+            // *Interaction from website with a prior discord interaction*
+            interaction = lastUserInteraction;
+            const currentQueue = distubeC.getQueue(interaction.guild);
+            if (currentQueue !== undefined) {
+                let formattedQueue = 
+                {
+                    length: currentQueue.songs.length,
+                    duration: currentQueue.formattedDuration,
+                    songs: currentQueue.songs.map((song, index) => {
+                        return {
+                            number: index,
+                            name: song.name,
+                            duration: song.formattedDuration,
+                            author: song.uploader.name,
+                            id: song.id
+                        }})
+                };
+                return formattedQueue;
+            } else {
+                return "The queue is empty";
+            }
+        }
     } else {
-        interaction.reply({ content: `The queue is empty` });
+        // *Interaction from discord*
+        const currentQueue = distubeC.getQueue(interaction.guild);
+        if (currentQueue !== undefined) {
+            interaction.reply({ content: 
+                `>>> **Songs in queue**: ${currentQueue.songs.length}\n` +
+                `**Queue Duration**: ${currentQueue.formattedDuration}\n` +
+                `**Current Song**: ${currentQueue.songs[0].name} - (${currentQueue.songs[0].formattedDuration})\n` +
+                `**Queue:**\n` + "```" +
+                currentQueue.songs.map((song, index) => `${index}. ${song.name}\n`).toString().replaceAll(",", "") +
+                "```"});
+        } else {
+            interaction.reply({ content: `The queue is empty` });
+        }
     }
+    return "Success";
 }
 
 export const commands = [playCommand.toJSON(), disconnectCommand.toJSON(), skipCommand.toJSON(), queueCommand.toJSON()];

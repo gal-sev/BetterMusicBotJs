@@ -1,6 +1,6 @@
 import express from 'express';
 import { config } from "dotenv";
-import { runBot, runWebDisconnectCommand, runWebPlayCommand, runWebSkipCommand } from "./src/bot.js";
+import { runBot, runWebDisconnectCommand, runWebPlayCommand, runWebQueueCommand, runWebSkipCommand } from "./src/bot.js";
 import path from "path";
 import { fileURLToPath } from 'url';
 
@@ -39,6 +39,10 @@ app.get(`/skip`, (req, res) => {
     } else {
         res.send(`Error: No discord user interaction avaliable.`);
     } 
+});
+
+app.get(`/queue`, (req, res) => {
+    res.send(runWebQueueCommand());
 });
 
 app.use(express.static(path.join(__dirname, "build")));
