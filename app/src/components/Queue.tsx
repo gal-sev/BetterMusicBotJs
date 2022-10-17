@@ -23,7 +23,7 @@ function Queue() {
   return (
     <div className='Content Queue'>
       <div className='QueueTop'>
-        <h2>Queue</h2>
+        <h2>Queue{getQueueDuration(queue)}</h2>
         {<button id='refreshButton' onClick={() => {
           axios.get("queue").then((res) => {
             setQueue(res.data);
@@ -39,9 +39,9 @@ function Queue() {
 
 function getQueueAsElement(queue: queueI | undefined | string) {
   if (queue === undefined) {
-    return <h3>Loading</h3>
+    return <h3>Loading</h3>;
   } else if (typeof queue === "string") {
-    return <h3>{queue}</h3>
+    return <h3>{queue}</h3>;
   } else {
     return <>
       {queue.songs.map((song: any, index: number) => {
@@ -49,6 +49,16 @@ function getQueueAsElement(queue: queueI | undefined | string) {
         time={song.duration} author={song.author}/>
       })}
     </>;
+  }
+}
+
+function getQueueDuration(queue: queueI | undefined | string) {
+  if (queue === undefined) {
+    return undefined;
+  } else if (typeof queue === "string") {
+    return undefined;
+  } else {
+    return ` - ${queue.duration}`;
   }
 }
 
