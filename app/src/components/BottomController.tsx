@@ -7,7 +7,6 @@ import { SendSkipSong } from "../shared/serverFuncs";
 function BottomController() {
   return (
     <div className="BottomController">
-      <h2 className='SongName' id='SongName'>song name</h2>
       <div className='SongControls'>
         <button id='backStepButton' onClick={() => {console.log("BackPress");}}><FontAwesomeIcon icon={faBackwardStep} /></button>
         <button id='playButton' ><FontAwesomeIcon icon={faPlay} /></button>

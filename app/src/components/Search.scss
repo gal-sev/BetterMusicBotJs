@@ -33,15 +33,26 @@
       background-color: rgba(0, 0, 0, 0);
       border: none;
       font-size: calc(10px + 1.5vmin);
-      color: #ffffff6e;
+      color: #ffffff78;
       transition: 0.3s;
       &:hover {
         transform: scale(1.15);
       }
       &:active {
-        color: darken($color: #ffffff6e, $amount: 20);
+        color: darken($color: #ffffff78, $amount: 20);
         transform: scale(1.10) translate(1px,2px);
       }
+    }
+  }
+  .QueueHolder {
+    display: flex;
+    flex-direction: column;
+    width: 98%;
+    height: 86%;
+    gap: 8px;
+    overflow-y: auto;
+    h3 {
+      text-align: center;
     }
   }
 }

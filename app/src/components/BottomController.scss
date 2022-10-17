@@ -6,14 +6,10 @@
   padding: 8px 0px;
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: space-evenly;
+  justify-content: center;
+  align-content: center;
   font-size: calc(10px + 2vmin);
   color: variables.$text-color;
-  .SongName {
-    font-size: calc(10px + 2vmin);
-    color: variables.$text-color;
-  }
   .SongControls {
     display: flex;
     flex-direction: row;
