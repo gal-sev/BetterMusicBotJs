@@ -14,6 +14,7 @@ const __dirname = path.dirname(__filename);
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const GUILD_ID = process.env.GUILD_ID;
+const YT_TOKEN = process.env.YT_TOKEN;
 
 runBot(BOT_TOKEN, CLIENT_ID, GUILD_ID);
 
@@ -42,6 +43,10 @@ app.get(`/skip`, (req, res) => {
 });
 
 app.get(`/queue`, (req, res) => {
+    res.send(runWebQueueCommand());
+});
+
+app.get(`/ytapi`, (req, res) => {
     res.send(runWebQueueCommand());
 });
 
