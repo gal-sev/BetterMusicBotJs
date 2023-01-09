@@ -1,5 +1,6 @@
 import path from 'path';
 import sqlite3 from 'sqlite3';
+import { fetchYoutubeStats } from './shared/youtubeHandler.js';
 
 const dbPath = path.join(process.cwd(), './playlists.db');
 /* TODO: check against Sql ingection & xss */
@@ -17,14 +18,14 @@ export function createBaseTables() {
 		UNIQUE(title)
 		)`;
 	const createSongsTable = `CREATE TABLE IF NOT EXISTS songs( 
-		id INTEGER PRIMARY KEY AUTOINCREMENT, 
+		id TEXT PRIMARY KEY, 
 		title TEXT NOT NULL,
-		length TEXT NOT NULL
+		duration TEXT NOT NULL
 		)`;
 	const createPlayListsSongs = `CREATE TABLE IF NOT EXISTS playlistsSongs( 
 		id INTEGER PRIMARY KEY AUTOINCREMENT, 
 		playlistID INTEGER NOT NULL,
-		songID INTEGER NOT NULL,
+		songID TEXT NOT NULL,
 		FOREIGN KEY (playlistID) REFERENCES playlists (id),
 		FOREIGN KEY (songID) REFERENCES songs (id)
 		)`;
@@ -54,13 +55,14 @@ export function createPlaylist(playlistTitle) {
 }
 
 // Insert song to playlist
-export async function insertSong(title, length, playlistID) {
-	const insertToSongs = `INSERT INTO songs(title, length)
-		VALUES (?, ?)`;
+//TODO: important, check if the playlist you are trying to add to exists
+export async function insertSong(songID, playlistID) {
+	const insertToSongs = `INSERT INTO songs(id, title, duration) 
+	VALUES (?, ?, ?)`;
 	const insertToPlaylistsSongs = `INSERT INTO playlistsSongs(playlistID, songID)
-		VALUES (?, ?)`;
-	let songID = await getSongRow(title);
-	if (songID !== undefined) {
+	VALUES (?, ?)`;
+	let songRow = await getSongRow(songID);
+	if (songRow.length != 0) {
 		// Song already exists in songs, insert only to playlistSongs
 		db.run(insertToPlaylistsSongs,
 			[playlistID, songID],
@@ -70,14 +72,16 @@ export async function insertSong(title, length, playlistID) {
 		);
 	} else {
 		// Song doesn't exist, insert it to songs and playlistSongs
+		let youtubeStats = await fetchYoutubeStats(songID);
+
 		db.run(insertToSongs,
-			[title, length],
+			[songID, youtubeStats.title, youtubeStats.duration],
 			(err) => {
 				if (err)  {
 					return console.error(err.message);
 				} else {
 					db.run(insertToPlaylistsSongs,
-						[playlistID, this.lastID],
+						[playlistID, songID],
 						(err) => {
 							if (err) return console.error(err.message);
 						}
@@ -85,15 +89,14 @@ export async function insertSong(title, length, playlistID) {
 				}
 			}
 		);
-
 	}
 }
 
 // Get song row from songs table
-export function getSongRow(title) {
+export function getSongRow(songID) {
 	return new Promise((resolve, reject) => {
-		const songRow = `SELECT 1 FROM songs WHERE title = ?`;
-		db.all(songRow, [title], (err, songRow) => {
+		const songRow = `SELECT 1 FROM songs WHERE id = ?`;
+		db.all(songRow, [songID], (err, songRow) => {
 			if (err) {
 				reject({message: err.message});
 			}

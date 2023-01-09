@@ -3,7 +3,7 @@ import { config } from "dotenv";
 import { runBot, runWebDisconnectCommand, runWebPlayCommand, runWebQueueCommand, runWebSkipCommand } from "./src/bot.js";
 import path from "path";
 import { fileURLToPath } from 'url';
-import { createBaseTables, createPlaylist } from './src/database.js';
+import { createBaseTables, createPlaylist, insertSong } from './src/database.js';
 
 const app = express();
 
@@ -53,7 +53,6 @@ app.get(`/ytapi`, (req, res) => {
 });
 
 // playlists:
-
 app.get(`/createPL/:title`, async (req, res) => {
     try {
         res.send(await createPlaylist(req.params.title));
@@ -63,9 +62,10 @@ app.get(`/createPL/:title`, async (req, res) => {
     }
 });
 
-app.get(`/addSong/:title`, async (req, res) => {
+app.get(`/addSong/:playlistID/:songID`, async (req, res) => {
     try {
-        res.send(await createPlaylist(req.params.title));
+        await insertSong(req.params.songID, req.params.playlistID);
+        res.send(`inserted song ${req.params.songID} to playlist ${req.params.playlistID}`);
     } catch (err) {
 		console.error(err);
         res.send(err);
