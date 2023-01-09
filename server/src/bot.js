@@ -20,6 +20,7 @@ client.DisTube = new DisTube(client, {
 
 export const distubeC = client.DisTube;
 
+// General commands:
 export function runWebPlayCommand(song) {
     return executePlayCommand(distubeC, undefined, song);
 }

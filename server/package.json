@@ -30,7 +30,8 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "libsodium-wrappers": "^0.7.10",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "sqlite3": "^5.1.4"
   },
   "type": "module",
   "devDependencies": {

@@ -12,8 +12,9 @@ const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
 // Create Playlists Table
 export function createBaseTables() {
 	const createMainPlaylistsTable = `CREATE TABLE IF NOT EXISTS playlists( 
-		id INTEGER PRIMARY KEY AUTOINCREMENT, 
-		title TEXT NOT NULL
+		id INTEGER PRIMARY KEY, 
+		title TEXT NOT NULL,
+		UNIQUE(title)
 		)`;
 	const createSongsTable = `CREATE TABLE IF NOT EXISTS songs( 
 		id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -22,9 +23,9 @@ export function createBaseTables() {
 		)`;
 	const createPlayListsSongs = `CREATE TABLE IF NOT EXISTS playlistsSongs( 
 		id INTEGER PRIMARY KEY AUTOINCREMENT, 
-		playlistID INTEGER NOT NULL, 
-		FOREIGN KEY (playlistID) REFERENCES playlists (id),
+		playlistID INTEGER NOT NULL,
 		songID INTEGER NOT NULL,
+		FOREIGN KEY (playlistID) REFERENCES playlists (id),
 		FOREIGN KEY (songID) REFERENCES songs (id)
 		)`;
 	db.serialize(() => {
@@ -36,14 +37,20 @@ export function createBaseTables() {
 
 // Create A new Playlists
 export function createPlaylist(playlistTitle) {
-	const insertNewPlaylist = `INSERT INTO playlists(title)
-		VALUES (?)`;
-	db.run(insertNewPlaylist,
-		[playlistTitle],
-		(err) => {
-			if (err) return console.error(err.message);
-		}
-	);
+	return new Promise((resolve, reject) => {
+		const insertNewPlaylist = `INSERT INTO playlists(title)
+			VALUES (?)`;
+		db.run(insertNewPlaylist,
+			[playlistTitle],
+			(err) => {
+				if (err) {
+					reject(err.message);
+				} else {
+					resolve(`Inserted playlist ${playlistTitle}`);
+				}
+			}
+		);
+	});
 }
 
 // Insert song to playlist

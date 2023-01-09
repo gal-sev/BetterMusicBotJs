@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import { runBot, runWebDisconnectCommand, runWebPlayCommand, runWebQueueCommand, runWebSkipCommand } from "./src/bot.js";
 import path from "path";
 import { fileURLToPath } from 'url';
+import { createBaseTables, createPlaylist } from './src/database.js';
 
 const app = express();
 
@@ -47,7 +48,28 @@ app.get(`/queue`, (req, res) => {
 });
 
 app.get(`/ytapi`, (req, res) => {
-    res.send(runWebQueueCommand());
+    //TODO: remove the yt token from the build and get it from here instead when loading the page
+    res.send(YT_TOKEN);
+});
+
+// playlists:
+
+app.get(`/createPL/:title`, async (req, res) => {
+    try {
+        res.send(await createPlaylist(req.params.title));
+    } catch (err) {
+		console.error(err);
+        res.send(err);
+    }
+});
+
+app.get(`/addSong/:title`, async (req, res) => {
+    try {
+        res.send(await createPlaylist(req.params.title));
+    } catch (err) {
+		console.error(err);
+        res.send(err);
+    }
 });
 
 app.use(express.static(path.join(__dirname, "build")));
@@ -57,6 +79,8 @@ app.get(`*`, (req, res) => {
 });
 
 const port = process.env.PORT || 4000;
-    app.listen(port, () => {
-        console.log('Hosted: http://localhost:' + port);
+app.listen(port, () => {
+    console.log('Hosted: http://localhost:' + port);
+    console.log('Creating db tables');
+    createBaseTables();
 });
