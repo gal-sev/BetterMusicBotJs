@@ -64,11 +64,10 @@ app.get(`/createPL/:title`, async (req, res) => {
 
 app.get(`/addSong/:playlistID/:songID`, async (req, res) => {
     try {
-        await insertSong(req.params.songID, req.params.playlistID);
-        res.send(`inserted song ${req.params.songID} to playlist ${req.params.playlistID}`);
+        res.send((await insertSong(req.params.songID, req.params.playlistID)));
     } catch (err) {
 		console.error(err);
-        res.send(err);
+        res.send(err.message);
     }
 });
 

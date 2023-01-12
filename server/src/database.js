@@ -55,52 +55,69 @@ export function createPlaylist(playlistTitle) {
 }
 
 // Insert song to playlist
-//TODO: important, check if the playlist you are trying to add to exists
 export async function insertSong(songID, playlistID) {
 	const insertToSongs = `INSERT INTO songs(id, title, duration) 
 	VALUES (?, ?, ?)`;
 	const insertToPlaylistsSongs = `INSERT INTO playlistsSongs(playlistID, songID)
 	VALUES (?, ?)`;
-	let songRow = await getSongRow(songID);
-	if (songRow.length != 0) {
-		// Song already exists in songs, insert only to playlistSongs
-		db.run(insertToPlaylistsSongs,
-			[playlistID, songID],
-			(err) => {
-				if (err) return console.error(err.message);
-			}
-		);
-	} else {
-		// Song doesn't exist, insert it to songs and playlistSongs
-		let youtubeStats = await fetchYoutubeStats(songID);
-
-		db.run(insertToSongs,
-			[songID, youtubeStats.title, youtubeStats.duration],
-			(err) => {
-				if (err)  {
-					return console.error(err.message);
-				} else {
-					db.run(insertToPlaylistsSongs,
-						[playlistID, songID],
-						(err) => {
-							if (err) return console.error(err.message);
-						}
-					);
+	if((await playlistExists(playlistID)).length != 0) {
+		let songRow = await getSongRow(songID);
+		if (songRow.length != 0) {
+			// Song already exists in songs, insert only to playlistSongs
+			db.run(insertToPlaylistsSongs,
+				[playlistID, songID],
+				(err) => {
+					if (err) return console.error(err.message);
 				}
-			}
-		);
+			);
+		} else {
+			// Song doesn't exist, insert it to songs and playlistSongs
+			let youtubeStats = await fetchYoutubeStats(songID);
+
+			db.run(insertToSongs,
+				[songID, youtubeStats.title, youtubeStats.duration],
+				(err) => {
+					if (err)  {
+						return console.error(err.message);
+					} else {
+						db.run(insertToPlaylistsSongs,
+							[playlistID, songID],
+							(err) => {
+								if (err) return console.error(err.message);
+							}
+						);
+					}
+				}
+			);
+		}
+	} else {
+		throw new Error("Error while adding song to playlist: the playlist doesn't exist");
 	}
+	return `inserted song ${songID} to playlist ${playlistID}`;
 }
 
 // Get song row from songs table
 export function getSongRow(songID) {
 	return new Promise((resolve, reject) => {
-		const songRow = `SELECT 1 FROM songs WHERE id = ?`;
-		db.all(songRow, [songID], (err, songRow) => {
+		const getSongRow = `SELECT 1 FROM songs WHERE id = ?`;
+		db.all(getSongRow, [songID], (err, songRow) => {
 			if (err) {
 				reject({message: err.message});
 			}
 			resolve(songRow);
+		});
+	});
+}
+
+// Get playlist row from playlists table if it exists
+export function playlistExists(playlistID) {
+	return new Promise((resolve, reject) => {
+		const getPlaylistRow = `SELECT 1 FROM playlists WHERE id = ?`;
+		db.all(getPlaylistRow, [playlistID], (err, playlistRow) => {
+			if (err) {
+				reject({message: err.message});
+			}
+			resolve(playlistRow);
 		});
 	});
 }
