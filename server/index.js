@@ -3,7 +3,7 @@ import { config } from "dotenv";
 import { runBot, runWebDisconnectCommand, runWebPlayCommand, runWebQueueCommand, runWebSkipCommand } from "./src/bot.js";
 import path from "path";
 import { fileURLToPath } from 'url';
-import { createBaseTables, createPlaylist, insertSong } from './src/database.js';
+import { createBaseTables, createPlaylist, getSongsInPlaylist, insertSong } from './src/database.js';
 
 const app = express();
 
@@ -65,6 +65,15 @@ app.get(`/createPL/:title`, async (req, res) => {
 app.get(`/addSong/:playlistID/:songID`, async (req, res) => {
     try {
         res.send((await insertSong(req.params.songID, req.params.playlistID)));
+    } catch (err) {
+		console.error(err);
+        res.send(err.message);
+    }
+});
+
+app.get(`/getPlaylist/:playlistID`, async (req, res) => {
+    try {
+        res.send((await getSongsInPlaylist(req.params.playlistID)));
     } catch (err) {
 		console.error(err);
         res.send(err.message);

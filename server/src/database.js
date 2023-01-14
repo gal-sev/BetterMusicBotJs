@@ -24,6 +24,7 @@ export function createBaseTables() {
 		)`;
 	const createPlayListsSongs = `CREATE TABLE IF NOT EXISTS playlistsSongs( 
 		id INTEGER PRIMARY KEY AUTOINCREMENT, 
+		qIndex INTEGER NOT NULL,
 		playlistID INTEGER NOT NULL,
 		songID TEXT NOT NULL,
 		FOREIGN KEY (playlistID) REFERENCES playlists (id),
@@ -58,14 +59,15 @@ export function createPlaylist(playlistTitle) {
 export async function insertSong(songID, playlistID) {
 	const insertToSongs = `INSERT INTO songs(id, title, duration) 
 	VALUES (?, ?, ?)`;
-	const insertToPlaylistsSongs = `INSERT INTO playlistsSongs(playlistID, songID)
-	VALUES (?, ?)`;
+	const insertToPlaylistsSongs = `INSERT INTO playlistsSongs(qIndex, playlistID, songID)
+	VALUES (?, ?, ?)`;
 	if((await playlistExists(playlistID)).length != 0) {
 		let songRow = await getSongRow(songID);
 		if (songRow.length != 0) {
+			let playlistLength = (await getSongsInPlaylist(playlistID)).length | 0;
 			// Song already exists in songs, insert only to playlistSongs
 			db.run(insertToPlaylistsSongs,
-				[playlistID, songID],
+				[playlistLength, playlistID, songID],
 				(err) => {
 					if (err) return console.error(err.message);
 				}
@@ -73,7 +75,7 @@ export async function insertSong(songID, playlistID) {
 		} else {
 			// Song doesn't exist, insert it to songs and playlistSongs
 			let youtubeStats = await fetchYoutubeStats(songID);
-
+			let playlistLength = (await getSongsInPlaylist(playlistID)).length | 0;
 			db.run(insertToSongs,
 				[songID, youtubeStats.title, youtubeStats.duration],
 				(err) => {
@@ -81,7 +83,7 @@ export async function insertSong(songID, playlistID) {
 						return console.error(err.message);
 					} else {
 						db.run(insertToPlaylistsSongs,
-							[playlistID, songID],
+							[playlistLength, playlistID, songID],
 							(err) => {
 								if (err) return console.error(err.message);
 							}
@@ -96,7 +98,7 @@ export async function insertSong(songID, playlistID) {
 	return `inserted song ${songID} to playlist ${playlistID}`;
 }
 
-// Get song row from songs table
+// Get song row from songs table if it exists
 export function getSongRow(songID) {
 	return new Promise((resolve, reject) => {
 		const getSongRow = `SELECT 1 FROM songs WHERE id = ?`;
@@ -127,6 +129,19 @@ export function getTableData(url) {
 	return new Promise((resolve, reject) => {
 		const getRows = `SELECT * FROM playlists WHERE url = ?`;
 		db.all(getRows, [url], (err, rows) => {
+			if (err) {
+				reject({message: err.message});
+			}
+			resolve(rows);
+		});
+	});
+}
+
+// Get songs in playlist
+export function getSongsInPlaylist(playlistID) {
+	return new Promise((resolve, reject) => {
+		const getPlaylistRows = `SELECT * FROM playlistsSongs WHERE playlistID = ?`;
+		db.all(getPlaylistRows, [playlistID], (err, rows) => {
 			if (err) {
 				reject({message: err.message});
 			}
